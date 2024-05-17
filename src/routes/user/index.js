@@ -134,7 +134,7 @@ userRoute.post('/users', (req, res) => {
 
   users.push(newUser);
 
-  return res.status(201).json({
+  return res.status(200).json({
     status: 'success',
     message: 'User added',
     data: newUser,
@@ -146,7 +146,7 @@ userRoute.delete('/users', (req, res) => {
   const userIndex = users.findIndex((u) => u.username === username);
 
   if (userIndex === -1) {
-    return res.status(404).json({
+    return res.status(400).json({
       status: 'error',
       message: 'User not found',
     });
@@ -166,7 +166,7 @@ userRoute.patch('/users', (req, res) => {
   const user = users.find((u) => u.username === username);
 
   if (!user) {
-    return res.status(404).json({
+    return res.status(400).json({
       status: 'error',
       message: 'User not found',
     });
