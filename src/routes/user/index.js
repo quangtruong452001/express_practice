@@ -2,7 +2,7 @@ import express from 'express';
 
 const userRoute = express.Router();
 
-const users = [
+let users = [
   {
     username: 'anle',
     fullname: 'Le Dang Hoang An',
@@ -27,21 +27,64 @@ const users = [
   // Add more users here if needed
 ];
 
+// userRoute.get('/users', (req, res) => {
+//   res.status(200).json({
+//     status: 'success',
+//     message: 'List of users',
+//     data: users,
+//   });
+// });
 
-
+// search with multiple query parameters
 userRoute.get('/users', (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    message: 'List of users',
-    data: users,
-  });
-});
+  const { username, fullname, role, project, activeYn } = req.query;
 
-userRoute.get('/users', (req, res) => {
-  const { username } = req.query;
-  const user = users.find((u) => u.username === username);
+  // If no query parameters are provided, return the full list of users
+  if (!username && !fullname && !role && !project && !activeYn) {
+    return res.status(200).json({
+      status: 'success',
+      message: 'List of users',
+      data: users,
+    });
+  }
 
-  if (!user) {
+  // If query parameters username are provided 
+  if (username) {
+    const user = users.find((u) => u.username === username);
+
+    if (!user) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'User not found',
+      });
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      message: 'User details',
+      data: user,
+    });
+  }
+
+  let result = [];
+
+  if (fullname) {
+    result = users.filter((u) => u.fullname === fullname);
+  }
+
+  if (role) {
+    result = users.filter((u) => u.role === role);
+  }
+
+  if (project) {
+    result = users.filter((u) => u.project.includes(project));
+  }
+
+  if (activeYn) {
+    result = users.filter((u) => u.activeYn === activeYn);
+  }
+
+  if (result.length === 0) {
     return res.status(400).json({
       status: 'error',
       message: 'User not found',
@@ -51,11 +94,12 @@ userRoute.get('/users', (req, res) => {
   return res.status(200).json({
     status: 'success',
     message: 'User details',
-    data: user,
+    data: result,
   });
+
 });
 
-userRoute.post('/users', (req, res) => {  
+userRoute.post('/users', (req, res) => {
   const { username, fullname, role, project, activeYn } = req.body;
 
   if (!username || !fullname || !role || !project || !activeYn) {
@@ -102,11 +146,12 @@ userRoute.delete('/users', (req, res) => {
     });
   }
 
-  users.splice(userIndex, 1);
+  const user = users.splice(userIndex, 1);
 
   return res.status(200).json({
     status: 'success',
     message: 'User deleted',
+    data: user,
   });
 });
 
@@ -150,4 +195,3 @@ userRoute.patch('/users', (req, res) => {
 });
 
 export default userRoute;
-  
