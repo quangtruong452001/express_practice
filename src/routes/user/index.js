@@ -57,25 +57,41 @@ userRoute.get('/users', (req, res) => {
     });
   }
 
-  let result = [];
+  let info = {};
 
   if (fullname) {
-    result = users.filter((u) => u.fullname === fullname);
+    info.fullname = fullname;
   }
 
   if (role) {
-    result = users.filter((u) => u.role === role);
+    info.role = role;
   }
 
   if (project) {
-    result = users.filter((u) => u.project.includes(project));
+    info.project = project;
   }
 
   if (activeYn) {
-    result = users.filter((u) => u.activeYn === activeYn);
+    info.activeYn = activeYn;
   }
 
-  if (result.length === 0) {
+  const filteredUsers = users.filter((u) => {
+    for (let key in info) {
+      // project
+      if (key === 'project') {
+        if (!u[key].includes(info[key])) {
+          return false;
+        }
+        continue;
+      }
+      if (u[key] !== info[key]) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  if (filteredUsers.length === 0) {
     return res.status(400).json({
       status: 'error',
       message: 'User not found',
@@ -85,9 +101,8 @@ userRoute.get('/users', (req, res) => {
   return res.status(200).json({
     status: 'success',
     message: 'User details',
-    data: result,
+    data: filteredUsers,
   });
-
 });
 
 userRoute.post('/users', (req, res) => {
@@ -158,6 +173,7 @@ userRoute.patch('/users', (req, res) => {
   }
 
   const { fullname, role, project, activeYn } = req.body;
+  user.fullname = user.fullname;
 
   if (fullname) {
     user.fullname = fullname;
