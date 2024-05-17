@@ -24,16 +24,7 @@ let users = [
     project: ['Mobile App', 'Analytics'],
     activeYn: 'N',
   },
-  // Add more users here if needed
 ];
-
-// userRoute.get('/users', (req, res) => {
-//   res.status(200).json({
-//     status: 'success',
-//     message: 'List of users',
-//     data: users,
-//   });
-// });
 
 // search with multiple query parameters
 userRoute.get('/users', (req, res) => {
